@@ -229,60 +229,106 @@ flutter run -d chrome
 
 ---
 
-## ⏱️ 5-Minute Presentation Script
+## ⏱️ 5-Minute Presentation Script (100% Flutter-Engineered)
 
-### **[0:00 - 0:45] Introduction & Architectural Vision**
-* **Action on Screen**:
-  1. Refresh the app to demonstrate the **Splash Screen** (glowing red cinema emblem and fade-in title).
-  2. Transition into the **Home Screen**.
-  3. Point to the dynamic time-of-day greeting header.
-* **What to Say**:
-  > *"Good morning / afternoon professors. Today I am presenting **Movie Explorer**, an entertainment application engineered to bridge the discovery experience of streaming platforms like **Netflix** with the transactional precision of cinema booking apps like **BookMyShow**.*  
-  > 
-  > *From an architectural standpoint, the app is built under strict constraints: **100% pure Material 3 Flutter**, **zero external pub packages**, and **zero external network dependencies**. All UI components, responsive matrices, and state updates run locally via pure Flutter widgets and an in-memory repository pattern.*  
-  > 
-  > *Notice the dynamic greeting at the top: it automatically detects the system clock and greets the user appropriately—right now reading `'Good morning/afternoon, Movie Buff'`."*
+> **Evaluator Context**: This script is tailored specifically for a **Flutter course practical evaluation**. It presents the project from the perspective of a Flutter engineer—highlighting the **Widget Tree**, **State Management**, **Layout Constraints**, **Animation Physics**, **Form Lifecycle**, and **Material 3 Theming** mechanisms used at every single step.
 
 ---
 
-### **[0:45 - 1:45] Home Hub & Discovery Innovations**
+### **[0:00 - 0:45] Phase 1: App Bootstrapping, Theme Engine & Splash Animation**
+
 * **Action on Screen**:
-  1. Swipe through the top **Hero PageView Banner** (featured cards with 2:3 posters, taglines, and dots indicator).
-  2. Tap across the horizontal **Genre Pills** (*Action, Comedy, Sci-Fi*) to show animated selection.
+  1. Trigger a hot-restart / refresh in Chrome to demonstrate the **Splash Screen** (pulsing glowing crimson emblem and fade-in title).
+  2. Transition smoothly into the **Home Screen**.
+  3. Point out the dynamic time-of-day greeting header (`"Good morning / afternoon / evening, Movie Buff"`).
+
+* **What to Say (Spoken Script)**:
+  > *"Good morning / afternoon professors. Today I am presenting **Movie Explorer**, an entertainment application engineered to bridge the cinematic discovery experience of streaming platforms like **Netflix** with the transactional checkout precision of cinema booking apps like **BookMyShow**.*  
+  > 
+  > *From a Flutter engineering perspective, the application was built under strict architectural constraints: **100% pure Material 3 Flutter**, **zero external pub dependencies**, and **zero external network packages**. Every transition, responsive matrix, and UI component is composed purely of Flutter's core widget framework.*  
+  > 
+  > *At the root in `main.dart`, we bootstrap the application by wrapping `MaterialApp` inside a `ValueListenableBuilder<ThemeMode>` listening to our repository's `themeModeNotifier`. This allows the entire widget tree to rebuild instantly between our customized dark and light `ThemeData` without losing navigation state.*  
+  > 
+  > *On launch, the `SplashScreen` initializes a `SingleTickerProviderStateMixin` and an `AnimationController` over 1200ms with `Curves.easeOutBack`, orchestrating an `AnimatedScale` and `AnimatedOpacity` transition. Navigation to `/home` is handled via a custom `PageRouteBuilder` with combined `FadeTransition` and `SlideTransition`. Notice the dynamic header: it queries `DateTime.now().hour` to conditionally render the greeting string based on the current system time."*
+
+* **Flutter Widgets & Concepts Explained**:
+  | Flutter Concept / Widget | Implementation Detail & Purpose |
+  | :--- | :--- |
+  | `ValueListenableBuilder<ThemeMode>` | Listens to `themeModeNotifier` at the root of `MaterialApp`. Only rebuilds the theme configuration without re-instantiating the repository or flushing screen state. |
+  | `ThemeData(useMaterial3: true)` | Centralized in [`app_theme.dart`](lib/theme/app_theme.dart). Defines the complete design system: custom `ColorScheme`, typography, `cardTheme`, `inputDecorationTheme`, and spacing tokens (8/12/16/24). |
+  | `SingleTickerProviderStateMixin` | Provides the `Ticker` for `AnimationController`, synchronizing animation tick callbacks with the device screen refresh rate (60Hz / 120Hz). |
+  | `PageRouteBuilder` | Overrides default platform transitions in `onGenerateRoute` with a combined `FadeTransition` and `SlideTransition(Tween<Offset>(begin: Offset(0.04, 0.0), end: Offset.zero))` with `Curves.easeOutCubic`. |
+  | `DateTime.now().hour` | Dynamic string interpolation in `_buildGreetingHeader()` without external date libraries. |
+
+---
+
+### **[0:45 - 1:45] Phase 2: Home Hub, Horizontal Viewports & Interactive Overlays**
+
+* **Action on Screen**:
+  1. Swipe smoothly across the top **Hero PageView Banner** (featured cards with 2:3 posters, taglines, and dots indicator).
+  2. Tap across the horizontal **Genre Pills** (*Action, Comedy, Sci-Fi, Horror*) to demonstrate animated selection states.
   3. Tap the **Magic Wand Icon** in the top AppBar to open the **MoodPickerSheet**.
-  4. Select *"Thrilled"*, slide the time slider to *"2.0 Hours"*, and tap *"Find My Movie"*.
-  5. Tap the **Dice Icon** to trigger the **SurpriseMovieDialog** (slot-machine poster cycle).
-* **What to Say**:
-  > *"On the home screen, our hero banner uses a `PageView.builder` with viewport fraction styling and synchronized dot indicators to showcase trending releases.*  
+  4. Select *"Thrilled"*, slide the duration slider to *"2.0 Hours"*, and tap *"Find My Movie"*.
+  5. Tap the **Dice Icon** to trigger the **SurpriseMovieDialog** (high-speed slot-machine poster cycling animation).
+
+* **What to Say (Spoken Script)**:
+  > *"Moving into the Home screen, the view is structured inside a `CustomScrollView` ensuring smooth 60fps scrolling.*  
   > 
-  > *Instead of bulky grids, genres are laid out as a sleek horizontal pill bar with custom `AnimatedContainer` states. Below, you see curated horizontal carousels: 'Trending Now', 'Top Rated', and 'New Releases'. Every poster adheres to a strict 2:3 cinematic aspect ratio with background watermark icons and dark scrim gradients.*  
+  > *At the top, our hero banner uses a `PageView.builder` paired with a `PageController(viewportFraction: 0.92)`. The fractional viewport allows adjacent movie cards to peek slightly into view, signaling horizontal affordance to the user. An `onPageChanged` callback invokes `setState` to update the active page index, animating the width and color of our synchronized dot indicators via `AnimatedContainer`.*  
   > 
-  > *To eliminate choice fatigue, I designed two innovative discovery tools:*  
-  > 1. *First is our **'What Should I Watch?' Mood Engine** [show bottom sheet]: users pick their current emotional vibe and available duration using a `Slider`. The app calculates a match with a personalized rationale.*  
-  > 2. *Second is the **'Surprise Me' Shuffle** [tap dice icon]: an `AnimatedSwitcher` cycles through the catalogue like a slot machine to recommend a random movie instantly."*
+  > *Below the hero section, the genre filter is laid out as a horizontal `ListView.separated`. Each pill is an `AnimatedContainer` wrapped in an `InkWell` providing Material ripple feedback. Tapping a pill mutates `_selectedGenre` and filters our local `MovieRepository` lists in real time.*  
+  > 
+  > *To eliminate choice fatigue, I built two interactive Flutter overlays:*  
+  > 1. *First is the **Mood Engine** [tap magic wand icon]: triggered via `showModalBottomSheet`. Notice that we wrapped the modal inside a `StatefulBuilder`. This is a critical Flutter optimization: it creates an independent element scope so that dragging the duration `Slider` only rebuilds the bottom sheet itself, without triggering an expensive rebuild of the underlying Home screen.*  
+  > 2. *Second is the **Surprise Me Shuffle** [tap dice icon]: launched via `showDialog`. It runs a periodic 120ms `Timer` for 2 seconds. The displayed movie card is wrapped in an `AnimatedSwitcher` with a `ScaleTransition` and `FadeTransition`, creating a high-speed slot-machine shuffle effect before settling on the recommended film."*
+
+* **Flutter Widgets & Concepts Explained**:
+  | Flutter Concept / Widget | Implementation Detail & Purpose |
+  | :--- | :--- |
+  | `PageView.builder` | Lazily constructs hero cards on demand. `viewportFraction: 0.92` calculates bounding box constraints so neighboring cards overflow slightly into the viewport. |
+  | `AnimatedContainer` | Used for dot indicators and genre chips. Automatically interpolates width (`8.0` to `24.0`), border radius, and color over `200ms` without needing an explicit `AnimationController`. |
+  | `showModalBottomSheet` + `StatefulBuilder` | Opens a modal surface. `StatefulBuilder` provides a local `StateSetter setState` to isolate slider drag updates to the modal subtree only. |
+  | `Slider` | Renders a Material 3 continuous/discrete slider with `divisions: 6`, `min: 1.0`, `max: 4.0`, updating selected duration in hours. |
+  | `AnimatedSwitcher` + `Timer.periodic` | Detects key changes when random movie models are cycled, applying a `ScaleTransition` and `FadeTransition` on each tick. |
 
 ---
 
-### **[1:45 - 2:30] Catalog, Live Search & Movie Details**
+### **[1:45 - 2:30] Phase 3: Catalog Filtering, Sliver Collapsing & Interactive Ratings**
+
 * **Action on Screen**:
-  1. Tap the **"Browse"** tab in the bottom navigation bar.
+  1. Tap the **"Browse"** tab in the bottom navigation bar (`NavigationBar`).
   2. Type `"spi"` into the sticky search bar to show instant filtering.
   3. Toggle the **List/Grid switcher** in the top-right toolbar to show smooth `AnimatedSwitcher` layout changes.
   4. Tap on **"Spider-Man: Across the Spider-Verse"** to push to **MovieDetailScreen**.
   5. Scroll down to demonstrate the collapsing `SliverAppBar` fading into the background.
   6. Tap on the 5-star rating bar to give it 5 stars and show the review box.
-* **What to Say**:
-  > *"Switching to the Browse tab, we have a sticky search bar with instant debounced filtering and a multi-attribute Sort dropdown (by Rating, Year, or Title). Notice the animated switcher toggle that flips seamlessly between a list view with 2-line synopses and a high-density poster grid.*  
+
+* **What to Say (Spoken Script)**:
+  > *"Switching to the Browse tab, we maintain a persistent `TextField` wrapped in an `InputDecorationTheme` for instant debounced search. As characters are typed, the `onChanged` callback filters our movie collection by title, director, and cast.*  
   > 
-  > *Tapping into any movie launches our detail view via a custom `PageRouteBuilder` fade-slide transition. We implemented a collapsible `CustomScrollView` with a `SliverAppBar` taking 45% of the viewport and fading smoothly into the near-black `#0B0B10` background.*  
+  > *In the top-right corner, we implemented a view mode toggle wrapped in an `AnimatedSwitcher`. Tapping it smoothly morphs between a `ListView.builder` displaying rich 2-line synopses, and a high-density 2-column `GridView.builder` utilizing `SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 2, childAspectRatio: 0.65)`. Every poster enforces a strict 2:3 cinematic aspect ratio using our reusable `MoviePosterImage` widget wrapped in an `AspectRatio`.*  
   > 
-  > *Here, the user can read the expandable synopsis, view circular cast avatars with initials, rate the movie on an interactive 5-star row, and browse similar titles in 'You May Also Like'."*
+  > *Tapping any card calls `Navigator.pushNamed` with the movie model passed via `arguments`. In `MovieDetailScreen`, notice the scrolling behavior: we implemented a `CustomScrollView` with a `SliverAppBar` set to `expandedHeight: 400` and `pinned: true`.*  
+  > 
+  > *Inside the `flexibleSpace`, the movie poster is layered beneath a dark vertical gradient. As the user scrolls up, Flutter's sliver protocol collapses the 400px header down to a standard 56px app bar, smoothly blending into the `#0B0B10` scaffold background.*  
+  > 
+  > *Down in the body, the cast list is generated using `CircleAvatar` widgets with initials fallbacks. Further down is an interactive 5-star rating bar built with a `Row` of 5 `GestureDetector` widgets. Tapping any star mutates `movie.userRating` and calls `setState`, dynamically unlocking an inline user review text container."*
+
+* **Flutter Widgets & Concepts Explained**:
+  | Flutter Concept / Widget | Implementation Detail & Purpose |
+  | :--- | :--- |
+  | `TextField(onChanged: ...)` | Live keystroke listener that runs query filtering and triggers `setState` to update the active item count. |
+  | `SliverGridDelegateWithFixedCrossAxisCount` | Calculates layout geometry for the 2-column grid with `crossAxisSpacing: 12`, `mainAxisSpacing: 12`, and `childAspectRatio: 0.65`. |
+  | `CustomScrollView` + `SliverAppBar` | Uses sliver geometry protocols to coordinate scrolling. `pinned: true` keeps navigation icons accessible while `FlexibleSpaceBar` handles parallax collapsing. |
+  | `SliverToBoxAdapter` | Bridges standard box-model widgets (cast avatars, description, buttons) into the sliver scroll area. |
+  | `GestureDetector` + `Row` | Handles hit testing for user rating stars, mapping index `0..4` to star fill states and calling `setState()`. |
 
 ---
 
-### **[2:30 - 3:45] The 3-Step Cinema Booking Experience & Perforated Ticket**
+### **[2:30 - 3:45] Phase 4: Cinema GridView, FormState Validation & Particle Canvas E-Ticket**
+
 * **Action on Screen**:
-  1. Tap the sticky **"Book Tickets Now"** button at the bottom.
+  1. Tap the sticky **"Book Tickets Now"** button in `MovieDetailScreen`'s bottom navigation bar.
   2. On **Step 1 (Date & Time)**: Tap through the next 7-day horizontal calendar and showtime pills. Tap **"Select Seats"**.
   3. On **Step 2 (Seat Map)**: 
      - Point to the curved **"SCREEN"** arc at the top.
@@ -296,47 +342,90 @@ flutter run -d chrome
   5. In **ConfirmationScreen**:
      - Point out the elastic checkmark bounce and floating confetti icons.
      - Point out the perforated ticket cutouts, dashed separator, and the **deterministic 8x8 QR code matrix** generated directly from the booking ID.
-* **What to Say**:
-  > *"Now for the core interactive feature: cinema booking. We structured this as an intuitive 3-step checkout wizard.*  
+
+* **What to Say (Spoken Script)**:
+  > *"Now we enter the cinema booking engine, architected as a 3-step state-driven wizard inside `BookingFormScreen`.*  
   > 
-  > *In Step 1, users select from a dynamically calculated 7-day date strip and showtime pills.*  
+  > *In Step 1, dates are dynamically generated for the upcoming 7 days using `List.generate` with `DateTime.now().add(Duration(days: index))` laid out in a horizontal `ListView`.*  
   > 
-  > *In Step 2 [show seat map], we built a custom cinema hall matrix using an 8x6 `GridView` layout. It features a curved canvas screen indicator, seat tier pricing—Regular, Premium, and Recliner—and three interactive states: Available, Selected, and Booked. The bill recalculates live with every tap.*  
+  > *In Step 2 [show seat map], we built a custom cinema hall matrix using an 8-column `GridView.builder` rendering 48 seats (Rows A through F, Columns 1 through 8). Seat selection state is tracked using a `Set<String> _selectedSeats`. Using a `Set` gives us $O(1)$ constant time lookup for membership.*  
   > 
-  > *In Step 3 [show form], our form enforces strict validation: minimum 3 characters for names, standard email regex, and an exact 10-digit numeric phone formatter with `FilteringTextInputFormatter.digitsOnly`.*  
+  > *Notice the dynamic tier pricing calculated via computed getters: Row F seats start with 'F' and cost ₹420 (Recliner tier), Row E seats cost ₹280 (Premium tier), while Rows A-D cost ₹180 (Regular tier). Tapping toggles membership and calls `setState`, updating the total amount in the sticky bottom bar instantly.*  
   > 
-  > *Upon confirmation, the app generates a realistic perforated e-ticket pass [show confirmation screen]. It features circular cutouts, a custom dashed divider, an animated checkmark entrance with floating confetti icons, and a deterministic 8x8 QR code matrix drawn completely with native Flutter `Container` blocks mapped from the unique booking ID."*
+  > *In Step 3 [show form], our form is guarded by a `GlobalKey<FormState>`. When the user taps 'Confirm & Pay', `_formKey.currentState!.validate()` evaluates each field's inline `validator`. The name validator requires at least 3 characters, the email validator enforces standard regex pattern matching, and the phone field pairs with `FilteringTextInputFormatter.digitsOnly` to reject non-numeric input at the platform channel level.*  
+  > 
+  > *Upon confirmation, the app navigates to `ConfirmationScreen` [show confirmation screen]. Notice the entrance animation: an `AnimationController` with `CurvedAnimation(Curves.elasticOut)` drives an `AnimatedScale` on the crimson checkmark emblem.*  
+  > 
+  > *Simultaneously, we engineered a custom particle confetti burst without any external packages. Using polar trigonometry `(dx = distance * cos(angle), dy = distance * sin(angle))`, 7 particle icons radiate outward and fade gracefully.*  
+  > 
+  > *Finally, observe the e-ticket pass: the top and bottom notches are rendered using negative-space half-circle `Container` widgets with `BorderRadius.only`. The dashed perforation is generated via `List.generate(28, ...)` drawing 1.5px divider segments. At the bottom, the 8x8 QR code is procedurally generated using an 8-column `GridView.count` where bit patterns are deterministically mapped from the ASCII hash codes of the booking ID string."*
+
+* **Flutter Widgets & Concepts Explained**:
+  | Flutter Concept / Widget | Implementation Detail & Purpose |
+  | :--- | :--- |
+  | `GridView.builder(crossAxisCount: 8)` | Renders the 48 cinema seats. Uses custom `SeatWidget` with three visual states: `available`, `selected`, and `booked`. |
+  | `Set<String> _selectedSeats` | Prevents duplicate seat entries and allows immediate $O(1)$ toggling via `_selectedSeats.contains(id)`. |
+  | `Form` + `GlobalKey<FormState>` | Orchestrates form validation lifecycle. `_formKey.currentState!.validate()` traverses all descendant `TextFormField` widgets and sets error states. |
+  | `FilteringTextInputFormatter.digitsOnly` | Native Flutter input formatter that intercepts raw platform text input to prevent non-digit entry on mobile keyboards. |
+  | `CurvedAnimation(Curves.elasticOut)` | Simulates realistic spring-damping physics for the checkmark badge entrance. |
+  | `TicketCard` Geometry | Generates realistic ticket cutouts using `BorderRadius.only(topRight/bottomRight)` and a deterministic 64-cell `GridView.count` for the procedural QR code. |
 
 ---
 
-### **[3:45 - 4:30] Watchlist Management & Analytics**
+### **[3:45 - 4:30] Phase 5: Watchlist Tabs, Real-Time Analytics & Dismissible Swipe-to-Delete**
+
 * **Action on Screen**:
   1. Tap **"Back to Home"**, then tap the **"Watchlist"** tab (Tab 3 in bottom navigation).
   2. Point to the top **Watching Progress Card** (`LinearProgressIndicator` showing e.g. "2 of 4 (50%)").
   3. Point to the **"Time to Watch"** and **"Favorite Genre"** statistic chips.
   4. Tap the **"Watched"** tab to show completed titles.
   5. Switch back to **"To Watch"**, swipe an item from right-to-left to delete it (`Dismissible`), and immediately tap **"UNDO"** on the floating `SnackBar` to restore it.
-* **What to Say**:
-  > *"The Watchlist screen acts as the user's personal movie vault. At the top, a live analytics card calculates the total hours left to watch and the user's favorite genre based on category frequency in their queue.*  
+
+* **What to Say (Spoken Script)**:
+  > *"The Watchlist screen serves as the user's personal movie vault, built using a `DefaultTabController(length: 2)` coordinating a `TabBar` and `TabBarView`.*  
   > 
-  > *A styled `LinearProgressIndicator` updates dynamically as movies are checked off as 'Watched'.*  
+  > *At the top, we engineered a real-time queue analytics card. A styled `LinearProgressIndicator` dynamically calculates completion progress by dividing watched titles by total queued titles. Next to it, the 'Favorite Genre' statistic is computed by running a frequency map across the user's saved list in `MovieRepository`, while 'Time to Watch' sums total movie durations into human-readable hours and minutes.*  
   > 
-  > *Using Flutter's built-in `Dismissible` widget with unique ValueKeys, users can swipe any movie to remove it. Notice the floating Material 3 `SnackBar` with an immediate 'UNDO' action that restores the item without data loss."*
+  > *For list item management, each card is wrapped in Flutter's native `Dismissible` widget keyed with a unique `ValueKey(movie.id)` and configured with `DismissDirection.endToStart`.*  
+  > 
+  > *As the user swipes left, the `background` reveals a crimson deletion container with a centered trash icon. Upon dismissal, `onDismissed` calls `repo.removeFromWatchlist(movie.id)` and presents a floating Material 3 `SnackBar`.*  
+  > 
+  > *Notice the `SnackBarAction`: tapping 'UNDO' immediately re-invokes `repo.addToWatchlist(movie.id)`, seamlessly restoring the movie into the active widget tree without data corruption."*
+
+* **Flutter Widgets & Concepts Explained**:
+  | Flutter Concept / Widget | Implementation Detail & Purpose |
+  | :--- | :--- |
+  | `DefaultTabController` + `TabBarView` | Manages tab state and handles swipe gestures between 'To Watch' and 'Watched' subtrees. |
+  | `LinearProgressIndicator` | Renders a Material 3 linear progress bar bound directly to `(watchedCount / totalCount).clamp(0.0, 1.0)`. |
+  | `Dismissible(key: ValueKey(...))` | Tracks widget identity across removals in the RenderObject tree. Handles horizontal drag gestures and exit animation. |
+  | `ScaffoldMessenger.of(context).showSnackBar()` | Displays a floating `SnackBar` anchored above the navigation bar with an interactive `SnackBarAction` for non-destructive undo. |
 
 ---
 
-### **[4:30 - 5:00] Code Architecture, Constraints & Conclusion**
+### **[4:30 - 5:00] Phase 6: Architecture, Zero-Overflow Strategies & Conclusion**
+
 * **Action on Screen**:
-  1. Open the left **CustomDrawer**.
-  2. Toggle the **Light/Dark Mode switch** to demonstrate instant theme propagation.
-  3. Conclude the demonstration.
-* **What to Say**:
-  > *"To ensure enterprise code quality:*  
-  > - *All style tokens are centralized in [`app_theme.dart`](lib/theme/app_theme.dart) with zero hardcoded colors or ad-hoc margins in any screen.*  
-  > - *State is handled cleanly using `setState` coordinated by an in-memory `ChangeNotifier` repository singleton.*  
-  > - *`flutter analyze` reports exactly zero errors and zero warnings, and our automated widget tests verify responsive layout across both small 360px and large 412px devices with zero `RenderFlex` overflows.*  
+  1. Open the left **CustomDrawer** by tapping the hamburger menu icon.
+  2. Toggle the **Light/Dark Mode switch** to demonstrate instant application-wide theme switching.
+  3. Close the drawer and summarize the engineering achievements.
+
+* **What to Say (Spoken Script)**:
+  > *"To summarize our software engineering architecture:*  
   > 
-  > *The entire project is pushed and documented on my GitHub repository. Thank you, and I am now ready for your questions."*
+  > *First, state is handled cleanly through a hybrid architecture: transient screen state (like active tabs, seat selections, and form inputs) is managed locally via `setState`, while global business data (such as movie models, bookings, watchlist sets, and theme mode) is managed by an in-memory `MovieRepository` singleton extending `ChangeNotifier`.*  
+  > 
+  > *Second, we enforced strict zero-overflow layout discipline: dynamic text strings are wrapped in `Expanded` or `Flexible` with `TextOverflow.ellipsis`, list viewports use lazy builders, and media elements enforce proportional `AspectRatio` constraints. In automated testing, `flutter analyze` passes with zero errors and zero warnings, and our 12 automated widget tests pass across both narrow 360px and large 412px viewports.*  
+  > 
+  > *The entire codebase is clean, modular, and available on my GitHub repository. Thank you, and I am now ready for your questions."*
+
+* **Flutter Widgets & Concepts Explained**:
+  | Flutter Concept / Widget | Implementation Detail & Purpose |
+  | :--- | :--- |
+  | `CustomDrawer` | Slide-out navigation drawer with user avatar, quick links, and theme toggle switch. |
+  | Bounded Constraints (`Expanded` / `Flexible`) | Ensures flex children inside `Row` and `Column` do not request infinite width, completely eliminating `RenderFlex overflowed` errors. |
+  | `flutter test` & `flutter analyze` | 12 automated unit and widget tests verifying repository state transitions, form validations, and multi-device viewport stability. |
+
+---
 
 ---
 
